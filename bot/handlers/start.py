@@ -14,12 +14,12 @@ async def cmd_start(message: Message):
     user_data = get_user(user_id)
     is_premium = user_data["is_premium"] if user_data else False
 
-    status_text = "**Премиум-аккаунт** (Без лимитов)" if is_premium else "**Бесплатный тариф** (До 3 валют и 2 городов)"
+    status_text = "Премиум-аккаунт" if is_premium else "Бесплатный тариф"
 
     text = (
         f"Привет, {message.from_user.first_name}!\n\n"
         f"Твой статус: {status_text}\n"
-        f"Выбирай валюты и города для получения ежедневной сводки:"
+        f"Выбирай валюты и города для получения сводки:"
     )
 
-    await message.answer(text, reply_markup=get_main_keyboard(is_premium), parse_mode="Markdown")
+    await message.answer(text, reply_markup=get_main_keyboard(is_premium))
