@@ -1,0 +1,14 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+if not BOT_TOKEN:
+    exit("Ошибка: BOT_TOKEN не найден в файле .env!")
+
+FREE_CURRENCY_LIMIT = 3
+FREE_WEATHER_LIMIT = 2
+
+PREMIUM_PRICE = 100
