@@ -96,6 +96,37 @@ async def process_remove_city(callback: CallbackQuery):
     await callback.message.edit_text(text, reply_markup=get_items_keyboard(cities, "city"))
     await callback.answer()
 
+@router.callback_query(F.data == "get_summary")
+async def process_get_summary(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    user_data = get_user(user_id)
+
+    currencies = ", ".join(user_data["currencies"]) if user_data and user_data["currencies"] else "Не выбраны"
+    cities = ", ".join(user_data["cities"]) if user_data and user_data["cities"] else "Не выбраны"
+
+    await callback.message.answer(
+        f"Твоя сводка:\n\n"
+        f"Валюты: {currencies}\n"
+        f"Города: {cities}"
+    )
+    await callback.answer()
+
+@router.callback_query(F.data == "main_menu")
+async def process_main_menu(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    user_data = get_user(user_id)
+    is_premium = user_data["is_premium"] if user_data else False
+
+    status_text = "Премиум-аккаунт" if is_premium else "Бесплатный тариф"
+    text = (
+        f"Главное меню\n\n"
+        f"Твой статус: {status_text}\n"
+        f"Выбирай валюты и города:"
+    )
+
+    await callback.message.edit_text(text, reply_markup=get_main_keyboard(is_premium))
+    await callback.answer()
+
 @router.message(F.text & ~F.text.startswith("/"))
 async def process_add_item_by_text(message: Message):
     user_id = message.from_user.id
@@ -147,34 +178,3 @@ async def process_add_item_by_text(message: Message):
     cities.append(city_name)
     update_user_selection(user_id, currencies, cities)
     await message.answer(f"Город {city_name} добавлен!\nПогода сейчас: {weather_info}")
-
-@router.callback_query(F.data == "get_summary")
-async def process_get_summary(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    user_data = get_user(user_id)
-
-    currencies = ", ".join(user_data["currencies"]) if user_data["currencies"] else "Не выбраны"
-    cities = ", ".join(user_data["cities"]) if user_data["cities"] else "Не выбраны"
-
-    await callback.message.answer(
-        f"Твоя сводка:\n\n"
-        f"Валюты: {currencies}\n"
-        f"Города: {cities}"
-    )
-    await callback.answer()
-
-@router.callback_query(F.data == "main_menu")
-async def process_main_menu(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    user_data = get_user(user_id)
-    is_premium = user_data["is_premium"] if user_data else False
-
-    status_text = "Премиум-аккаунт" if is_premium else "Бесплатный тариф"
-    text = (
-        f"Главное меню\n\n"
-        f"Твой статус: {status_text}\n"
-        f"Выбирай валюты и города:"
-    )
-
-    await callback.message.edit_text(text, reply_markup=get_main_keyboard(is_premium))
-    await callback.answer()
